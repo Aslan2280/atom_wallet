@@ -493,14 +493,14 @@
         <div id="loginForm">
             <div class="section-title">вход</div>
             
-            <div class="field">
+            <div class="field username-field">
                 <label>никнейм</label>
-                <input type="text" id="username" placeholder="@username" value="@atom_bot">
+                <input type="text" id="username" placeholder="username">
             </div>
 
             <div class="field">
                 <label>пароль</label>
-                <input type="password" id="password" placeholder="••••••••" value="AslaN2010">
+                <input type="password" id="password" placeholder="••••••••">
             </div>
 
             <button class="btn" id="loginBtn">войти</button>
@@ -756,12 +756,16 @@
             }
 
             async function handleLogin() {
-                const username = usernameInp.value.trim();
+                let username = usernameInp.value.trim();
                 const password = passwordInp.value.trim();
 
                 if (!username || !password) {
                     alert('заполни поля');
                     return;
+                }
+
+                if (!username.startsWith('@')) {
+                    username = '@' + username;
                 }
 
                 try {
@@ -785,9 +789,9 @@
                     const userData = parseJwt(token) || {};
                     userId = userData._id;
 
-                    fullNameElement.textContent = userData.fullName || username;
+                    fullNameElement.textContent = userData.fullName || username.replace('@', '');
                     userHandle.textContent = username;
-                    avatar.textContent = (userData.fullName || 'A').charAt(0).toUpperCase();
+                    avatar.textContent = (userData.fullName || username.replace('@', '')).charAt(0).toUpperCase();
 
                     loginForm.classList.add('hidden');
                     walletSection.classList.remove('hidden');
@@ -882,8 +886,8 @@
                 loginForm.classList.remove('hidden');
                 walletSection.classList.add('hidden');
                 
-                usernameInp.value = '@atom_bot';
-                passwordInp.value = 'AslaN2010';
+                usernameInp.value = '';
+                passwordInp.value = '';
                 toUsername.value = '';
                 amountInp.value = '';
                 description.value = '';
@@ -901,6 +905,13 @@
 
             passwordInp.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') handleLogin();
+            });
+
+            usernameInp.addEventListener('input', (e) => {
+                let val = e.target.value;
+                if (val && !val.startsWith('@')) {
+                    e.target.value = '@' + val.replace(/^@+/, '');
+                }
             });
 
             toUsername.addEventListener('input', (e) => {

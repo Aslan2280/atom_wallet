@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Atom Wallet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            line-height: 1.4;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .wallet {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 32px;
+            width: 100%;
+            max-width: 560px;
+            padding: 24px 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .logo {
+            background: #ed5d19;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .title {
+            font-size: 26px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+
+        .badge {
+            background: #141414;
+            border: 1px solid #2a2a2a;
+            color: #ed5d19;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: #666;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin: 24px 0 12px 0;
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+
+        .field label {
+            display: block;
+            color: #aaa;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .field input {
+            width: 100%;
+            background: #111;
+            border: 1px solid #2a2a2a;
+            border-radius: 24px;
+            padding: 14px 18px;
+            font-size: 16px;
+            color: #fff;
+            outline: none;
+            transition: border 0.15s;
+        }
+
+        .field input:focus {
+            border-color: #ed5d19;
+        }
+
+        .field input::placeholder {
+            color: #444;
+            font-size: 15px;
+        }
+
+        .username-field {
+            position: relative;
+        }
+
+        .username-field input {
+            padding-left: 32px;
+        }
+
+        .username-field::before {
+            content: '@';
+            position: absolute;
+            left: 18px;
+            top: 42px;
+            color: #888;
+            font-size: 16px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .btn {
+            background: #ed5d19;
+            border: none;
+            border-radius: 28px;
+            padding: 16px 20px;
+            font-size: 17px;
+            font-weight: 600;
+            color: #000;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.15s;
+            margin-top: 8px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .btn:active {
+            background: #ff6f2a;
+            transform: scale(0.99);
+        }
+
+        .btn-secondary {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        .btn-secondary:active {
+            background: #2a2a2a;
+        }
+
+        .btn-danger {
+            background: #1a0a0a;
+            color: #ff6b6b;
+        }
+
+        .btn-danger:active {
+            background: #2a0a0a;
+        }
+
+        .profile {
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            border-radius: 24px;
+            padding: 20px;
+            margin: 16px 0 20px;
+        }
+
+        .profile-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .avatar {
+            width: 64px;
+            height: 64px;
+            background: #ed5d19;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 600;
+            color: #000;
+            flex-shrink: 0;
+        }
+
+        .info h2 {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+
+        .info .handle {
+            color: #ed5d19;
+            font-size: 14px;
+        }
+
+        .balance-card {
+            background: #000;
+            border: 1px solid #2a2a2a;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .balance-label {
+            color: #888;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .balance-amount {
+            color: #fff;
+            font-size: 44px;
+            font-weight: 700;
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .balance-amount span {
+            color: #ed5d19;
+            font-size: 22px;
+            font-weight: 400;
+            margin-left: 6px;
+        }
+
+        .balance-updated {
+            color: #666;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 6px;
+            margin: 20px 0;
+        }
+
+        .tab {
+            flex: 1;
+            background: #111;
+            border: 1px solid #2a2a2a;
+            border-radius: 30px;
+            padding: 12px 6px;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .tab.active {
+            background: #ed5d19;
+            border-color: #ed5d19;
+            color: #000;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .stat-item {
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            border-radius: 18px;
+            padding: 16px 12px;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .stat-value small {
+            color: #ed5d19;
+            font-size: 13px;
+            margin-left: 4px;
+        }
+
+        .history-list {
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            border-radius: 20px;
+            padding: 8px 12px;
+            max-height: 340px;
+            overflow-y: auto;
+        }
+
+        .tx-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid #222;
+        }
+
+        .tx-item:last-child {
+            border-bottom: none;
+        }
+
+        .tx-info {
+            flex: 1;
+            padding-right: 12px;
+        }
+
+        .tx-desc {
+            color: #fff;
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+
+        .tx-meta {
+            color: #888;
+            font-size: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tx-amount {
+            font-weight: 700;
+            font-size: 18px;
+            white-space: nowrap;
+        }
+
+        .tx-plus {
+            color: #4caf50;
+        }
+
+        .tx-minus {
+            color: #ed5d19;
+        }
+
+        .success {
+            background: #122212;
+            border: 1px solid #2a5a2a;
+            color: #9eff9e;
+            padding: 12px 16px;
+            border-radius: 20px;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+
+        .error {
+            background: #221212;
+            border: 1px solid #5a2a2a;
+            color: #ff9e9e;
+            padding: 12px 16px;
+            border-radius: 20px;
+            margin: 16px 0;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 30px;
+            font-size: 14px;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #1a1a1a;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .footer a {
+            color: #ed5d19;
+            text-decoration: none;
+            border-bottom: 1px dotted #ed5d19;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .actions .btn {
+            margin: 0;
+            padding: 14px 16px;
+            font-size: 15px;
+        }
+
+        @media (max-width: 380px) {
+            .wallet {
+                padding: 20px 16px;
+            }
+            
+            .balance-amount {
+                font-size: 36px;
+            }
+            
+            .balance-amount span {
+                font-size: 18px;
+            }
+            
+            .profile-row {
+                gap: 12px;
+            }
+            
+            .avatar {
+                width: 52px;
+                height: 52px;
+                font-size: 24px;
+            }
+            
+            .info h2 {
+                font-size: 18px;
+            }
+            
+            .tx-amount {
+                font-size: 16px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .wallet {
+                padding: 32px 28px;
+            }
+            
+            .balance-amount {
+                font-size: 52px;
+            }
+            
+            .stats-grid {
+                gap: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wallet">
+        <div class="header">
+            <div class="logo">💰</div>
+            <div class="title">Atom Wallet</div>
+        </div>
+        <div class="badge">кошелёк экосистемы</div>
+        
+        <div id="loginForm">
+            <div class="section-title">вход</div>
+            
+            <div class="field">
+                <label>никнейм</label>
+                <input type="text" id="username" placeholder="@username" value="@atom_bot">
+            </div>
+
+            <div class="field">
+                <label>пароль</label>
+                <input type="password" id="password" placeholder="••••••••" value="AslaN2010">
+            </div>
+
+            <button class="btn" id="loginBtn">войти</button>
+        </div>
+
+        <div id="walletSection" class="hidden">
+            <div class="profile">
+                <div class="profile-row">
+                    <div class="avatar" id="avatar">⚛️</div>
+                    <div class="info">
+                        <h2 id="fullName"></h2>
+                        <div class="handle" id="userHandle"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="balance-card">
+                <div class="balance-label">баланс atm</div>
+                <div class="balance-amount" id="balanceDisplay">0 <span>ATM</span></div>
+                <div class="balance-updated" id="balanceUpdated">—</div>
+            </div>
+
+            <div class="tabs">
+                <div class="tab active" data-tab="transfer">перевод</div>
+                <div class="tab" data-tab="history">история</div>
+                <div class="tab" data-tab="stats">статистика</div>
+            </div>
+
+            <div id="transferTab" class="tab-content active">
+                <div class="section-title">новый перевод</div>
+                
+                <div class="field username-field">
+                    <label>получатель</label>
+                    <input type="text" id="toUsername" placeholder="username">
+                </div>
+
+                <div class="field">
+                    <label>сумма</label>
+                    <input type="number" id="amount" placeholder="0" min="0.01" step="0.01">
+                </div>
+
+                <div class="field">
+                    <label>описание</label>
+                    <input type="text" id="description" placeholder="необязательно">
+                </div>
+
+                <button class="btn" id="transferBtn">отправить</button>
+                <div id="transferMessage"></div>
+            </div>
+
+            <div id="historyTab" class="tab-content">
+                <div class="section-title">операции</div>
+                <div id="transactionList" class="history-list">
+                    <div class="loading">загрузка...</div>
+                </div>
+            </div>
+
+            <div id="statsTab" class="tab-content">
+                <div class="section-title">аналитика</div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">всего</div>
+                        <div class="stat-value" id="totalTransactions">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">получено</div>
+                        <div class="stat-value" id="totalReceived">0 <small>ATM</small></div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">отправлено</div>
+                        <div class="stat-value" id="totalSent">0 <small>ATM</small></div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">средний</div>
+                        <div class="stat-value" id="averageAmount">0 <small>ATM</small></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-secondary" id="refreshDataBtn">обновить</button>
+                <button class="btn btn-danger" id="logoutBtn">выйти</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span>Atom Wallet</span>
+            <a id="logoutLink">выйти</a>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            let currentToken = null;
+            let userId = null;
+            let transactions = [];
+            let balance = 0;
+
+            const loginForm = document.getElementById('loginForm');
+            const walletSection = document.getElementById('walletSection');
+            
+            const usernameInp = document.getElementById('username');
+            const passwordInp = document.getElementById('password');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            const avatar = document.getElementById('avatar');
+            const fullNameElement = document.getElementById('fullName');
+            const userHandle = document.getElementById('userHandle');
+            const balanceDisplay = document.getElementById('balanceDisplay');
+            const balanceUpdated = document.getElementById('balanceUpdated');
+            
+            const toUsername = document.getElementById('toUsername');
+            const amountInp = document.getElementById('amount');
+            const description = document.getElementById('description');
+            const transferBtn = document.getElementById('transferBtn');
+            const transferMessage = document.getElementById('transferMessage');
+            
+            const transactionList = document.getElementById('transactionList');
+            
+            const totalTransactions = document.getElementById('totalTransactions');
+            const totalReceived = document.getElementById('totalReceived');
+            const totalSent = document.getElementById('totalSent');
+            const averageAmount = document.getElementById('averageAmount');
+            
+            const refreshDataBtn = document.getElementById('refreshDataBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const logoutLink = document.getElementById('logoutLink');
+
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabName = tab.dataset.tab;
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(c => c.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(`${tabName}Tab`).classList.add('active');
+                    
+                    if (tabName === 'history' && transactions.length === 0 && currentToken) {
+                        loadTransactions();
+                    }
+                });
+            });
+
+            function parseJwt(token) {
+                try {
+                    const base64Url = token.split('.')[1];
+                    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                    return JSON.parse(atob(base64));
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            async function loadBalance() {
+                if (!currentToken || !userId) return;
+
+                try {
+                    const response = await fetch(`https://atomglidedev.ru/users/${userId}`, {
+                        headers: { 'Authorization': `Bearer ${currentToken}` }
+                    });
+
+                    if (!response.ok) throw new Error();
+                    
+                    const data = await response.json();
+                    balance = parseFloat(data.balance) || 0;
+                    
+                    balanceDisplay.innerHTML = `${balance.toFixed(2)} <span>ATM</span>`;
+                    
+                    const now = new Date();
+                    balanceUpdated.textContent = `${now.getHours()}:${now.getMinutes().toString().padStart(2,'0')}`;
+                    
+                } catch (err) {
+                    balanceDisplay.innerHTML = `? <span>ATM</span>`;
+                }
+            }
+
+            async function loadTransactions() {
+                if (!currentToken) return;
+
+                try {
+                    transactionList.innerHTML = '<div class="loading">загрузка...</div>';
+
+                    const response = await fetch('https://atomglidedev.ru/auth/transactions', {
+                        headers: { 'Authorization': `Bearer ${currentToken}` }
+                    });
+
+                    if (!response.ok) throw new Error();
+                    
+                    const data = await response.json();
+                    transactions = Array.isArray(data) ? data : (data.transactions || []);
+                    
+                    if (transactions.length === 0) {
+                        transactionList.innerHTML = '<div style="color:#666; text-align:center; padding:30px;">нет операций</div>';
+                        return;
+                    }
+
+                    let html = '';
+                    transactions.forEach(tx => {
+                        const amount = parseFloat(tx.amount) || 0;
+                        const isOutgoing = tx.from === userId;
+                        const other = isOutgoing ? (tx.to || '—') : (tx.from || '—');
+                        const date = new Date(tx.createdAt || Date.now());
+                        const time = `${date.getHours()}:${date.getMinutes().toString().padStart(2,'0')}`;
+                        
+                        html += `
+                            <div class="tx-item">
+                                <div class="tx-info">
+                                    <div class="tx-desc">${tx.description || 'перевод'}</div>
+                                    <div class="tx-meta">${other} · ${time}</div>
+                                </div>
+                                <div class="tx-amount ${isOutgoing ? 'tx-minus' : 'tx-plus'}">
+                                    ${isOutgoing ? '−' : '+'}${amount.toFixed(2)}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    transactionList.innerHTML = html;
+                    updateStats();
+
+                } catch (err) {
+                    transactionList.innerHTML = '<div class="error">ошибка загрузки</div>';
+                }
+            }
+
+            function updateStats() {
+                let sent = 0, received = 0, sentCount = 0, receivedCount = 0;
+                
+                transactions.forEach(tx => {
+                    const amount = parseFloat(tx.amount) || 0;
+                    const isOutgoing = tx.from === userId;
+                    
+                    if (isOutgoing) {
+                        sent += amount;
+                        sentCount++;
+                    } else {
+                        received += amount;
+                        receivedCount++;
+                    }
+                });
+
+                totalTransactions.textContent = transactions.length;
+                totalReceived.textContent = received.toFixed(2);
+                totalSent.textContent = sent.toFixed(2);
+                
+                const avg = (sent + received) / (sentCount + receivedCount) || 0;
+                averageAmount.textContent = avg.toFixed(2);
+            }
+
+            async function handleLogin() {
+                const username = usernameInp.value.trim();
+                const password = passwordInp.value.trim();
+
+                if (!username || !password) {
+                    alert('заполни поля');
+                    return;
+                }
+
+                try {
+                    loginBtn.textContent = '⏳';
+                    loginBtn.disabled = true;
+
+                    const response = await fetch('https://atomglidedev.ru/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    if (!response.ok) throw new Error();
+                    
+                    const data = await response.json();
+                    const token = data.token || data.access_token;
+                    
+                    if (!token) throw new Error();
+
+                    currentToken = token;
+                    const userData = parseJwt(token) || {};
+                    userId = userData._id;
+
+                    fullNameElement.textContent = userData.fullName || username;
+                    userHandle.textContent = username;
+                    avatar.textContent = (userData.fullName || 'A').charAt(0).toUpperCase();
+
+                    loginForm.classList.add('hidden');
+                    walletSection.classList.remove('hidden');
+                    
+                    await Promise.all([loadBalance(), loadTransactions()]);
+
+                } catch (err) {
+                    alert('ошибка входа');
+                } finally {
+                    loginBtn.textContent = 'войти';
+                    loginBtn.disabled = false;
+                }
+            }
+
+            async function handleTransfer() {
+                let to = toUsername.value.trim();
+                const amount = parseFloat(amountInp.value);
+                const desc = description.value.trim() || 'перевод';
+
+                if (!to) {
+                    alert('укажи получателя');
+                    return;
+                }
+
+                if (!amount || amount <= 0) {
+                    alert('укажи сумму');
+                    return;
+                }
+
+                if (amount > balance) {
+                    alert(`недостаточно средств`);
+                    return;
+                }
+
+                if (!to.startsWith('@')) {
+                    to = '@' + to;
+                }
+
+                try {
+                    transferBtn.textContent = '⏳';
+                    transferBtn.disabled = true;
+
+                    const response = await fetch('https://atomglidedev.ru/auth/transfer', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${currentToken}`
+                        },
+                        body: JSON.stringify({
+                            username: to,
+                            amount: amount,
+                            description: desc
+                        })
+                    });
+
+                    if (!response.ok) throw new Error();
+
+                    await Promise.all([loadBalance(), loadTransactions()]);
+
+                    toUsername.value = '';
+                    amountInp.value = '';
+                    description.value = '';
+
+                    transferMessage.innerHTML = '<div class="success">✓ перевод отправлен</div>';
+                    setTimeout(() => transferMessage.innerHTML = '', 2000);
+
+                } catch (err) {
+                    transferMessage.innerHTML = '<div class="error">ошибка перевода</div>';
+                } finally {
+                    transferBtn.textContent = 'отправить';
+                    transferBtn.disabled = false;
+                }
+            }
+
+            async function refreshAll() {
+                if (!currentToken) return;
+                
+                refreshDataBtn.textContent = '⏳';
+                refreshDataBtn.disabled = true;
+                
+                await Promise.all([loadBalance(), loadTransactions()]);
+                
+                refreshDataBtn.textContent = 'обновить';
+                refreshDataBtn.disabled = false;
+            }
+
+            function logout() {
+                currentToken = null;
+                userId = null;
+                transactions = [];
+                
+                loginForm.classList.remove('hidden');
+                walletSection.classList.add('hidden');
+                
+                usernameInp.value = '@atom_bot';
+                passwordInp.value = 'AslaN2010';
+                toUsername.value = '';
+                amountInp.value = '';
+                description.value = '';
+                transferMessage.innerHTML = '';
+            }
+
+            loginBtn.addEventListener('click', handleLogin);
+            transferBtn.addEventListener('click', handleTransfer);
+            refreshDataBtn.addEventListener('click', refreshAll);
+            logoutBtn.addEventListener('click', logout);
+            logoutLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                logout();
+            });
+
+            passwordInp.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleLogin();
+            });
+
+            toUsername.addEventListener('input', (e) => {
+                let val = e.target.value;
+                if (val && !val.startsWith('@')) {
+                    e.target.value = '@' + val.replace(/^@+/, '');
+                }
+            });
+
+            logout();
+        })();
+    </script>
+</body>
+</html>

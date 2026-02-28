@@ -367,12 +367,12 @@
             white-space: nowrap;
         }
 
-        .tx-plus {
-            color: #4caf50;
-        }
-
         .tx-minus {
             color: #ed5d19;
+        }
+
+        .tx-neutral {
+            color: #4caf50;
         }
 
         .success {
@@ -599,6 +599,7 @@
             let userId = null;
             let transactions = [];
             let balance = 0;
+            let userDataCache = null;
 
             const loginForm = document.getElementById('loginForm');
             const walletSection = document.getElementById('walletSection');
@@ -648,6 +649,36 @@
                     }
                 });
             });
+
+            function saveSession(token, userData) {
+                localStorage.setItem('atom_token', token);
+                localStorage.setItem('atom_user', JSON.stringify(userData));
+            }
+
+            function loadSession() {
+                const token = localStorage.getItem('atom_token');
+                const userData = JSON.parse(localStorage.getItem('atom_user') || 'null');
+                
+                if (token && userData) {
+                    currentToken = token;
+                    userId = userData._id;
+                    userDataCache = userData;
+                    
+                    fullNameElement.textContent = userData.fullName || userData.username.replace('@', '');
+                    userHandle.textContent = userData.username;
+                    avatar.textContent = (userData.fullName || userData.username.replace('@', '')).charAt(0).toUpperCase();
+
+                    loginForm.classList.add('hidden');
+                    walletSection.classList.remove('hidden');
+                    
+                    Promise.all([loadBalance(), loadTransactions()]);
+                }
+            }
+
+            function clearSession() {
+                localStorage.removeItem('atom_token');
+                localStorage.removeItem('atom_user');
+            }
 
             function parseJwt(token) {
                 try {
@@ -716,8 +747,8 @@
                                     <div class="tx-desc">${tx.description || 'перевод'}</div>
                                     <div class="tx-meta">${other} · ${time}</div>
                                 </div>
-                                <div class="tx-amount ${isOutgoing ? 'tx-minus' : 'tx-plus'}">
-                                    ${isOutgoing ? '−' : '+'}${amount.toFixed(2)}
+                                <div class="tx-amount ${isOutgoing ? 'tx-minus' : 'tx-neutral'}">
+                                    ${isOutgoing ? '−' : ''}${amount.toFixed(2)}
                                 </div>
                             </div>
                         `;
@@ -788,10 +819,13 @@
                     currentToken = token;
                     const userData = parseJwt(token) || {};
                     userId = userData._id;
+                    userDataCache = { ...userData, username };
 
                     fullNameElement.textContent = userData.fullName || username.replace('@', '');
                     userHandle.textContent = username;
                     avatar.textContent = (userData.fullName || username.replace('@', '')).charAt(0).toUpperCase();
+
+                    saveSession(token, userDataCache);
 
                     loginForm.classList.add('hidden');
                     walletSection.classList.remove('hidden');
@@ -882,6 +916,9 @@
                 currentToken = null;
                 userId = null;
                 transactions = [];
+                userDataCache = null;
+                
+                clearSession();
                 
                 loginForm.classList.remove('hidden');
                 walletSection.classList.add('hidden');
@@ -921,7 +958,7 @@
                 }
             });
 
-            logout();
+            loadSession();
         })();
     </script>
 </body>
